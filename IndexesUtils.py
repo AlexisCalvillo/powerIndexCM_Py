@@ -3,11 +3,18 @@
 #Imports
 import numpy as np
 
-def calcCombVal(vecVot,nJugTot, votMin):
+def calcCombVal(vecVot,nPlayTot, votMin):
   #Genera matriz con todas las combinaciones
+  """
+    Generate a matrix with all the posibble combinations 
+    
+    nPlayTot: Number of players
+    VecVot: Vector of player weights
+    q: percent of the total weight (quota, o to 1)
+  """
   MComb=[]
-  for i in range(2**nJugTot):
-    MComb.append([int(n) for n in bin(i)[2:].zfill(nJugTot)])
+  for i in range(2**nPlayTot):
+    MComb.append([int(n) for n in bin(i)[2:].zfill(nPlayTot)])
   #Genera matriz con todas las combinaciones validas
   MCombVal=[]  
   for x in MComb:
@@ -15,23 +22,28 @@ def calcCombVal(vecVot,nJugTot, votMin):
       MCombVal.append(x)
   return MCombVal
 
-def calcMatrEcu(vecVot):
-  #Cálcula las coaliciones mínimas y el número de "padres" o formas de llegar a estas
+def calcMatrEcu(vecVot, q):
+  """
+    Cauclates the set of minimal winning coalitions and the number of paths to reach that coalition
+
+    VecVot: Vector of player weights
+    q: percent of the total weight (quota, o to 1)
+  """
+
   matrEcu=[]
-  nJugTot=len(vecVot)
-  votMin=np.sum(vecVot)/2
-  MCombVal=calcCombVal(vecVot,nJugTot, votMin)
+  nPlayTot=len(vecVot)
+  votMin=np.sum(vecVot)*q
+  MCombVal=calcCombVal(vecVot,nPlayTot, votMin)
   
-  i=nJugTot
+  i=nPlayTot
   for x in MCombVal:
     if i>=np.sum(x):i=np.sum(x)
   
   condPar=1
-  #for i in range(nJugTot):
   cont=-1 
   while  condPar:
-    nivInf=[[0]*nJugTot]
-    nivSup=[[0]*nJugTot]
+    nivInf=[[0]*nPlayTot]
+    nivSup=[[0]*nPlayTot]
     for x in MCombVal:
       if(np.sum(x)==i+1):
         nivSup.append(x)
@@ -50,7 +62,7 @@ def calcMatrEcu(vecVot):
             aux=1
             cont=cont+1
           else:
-            matrEcu[cont][nJugTot]=matrEcu[cont][nJugTot]+1  
+            matrEcu[cont][nPlayTot]=matrEcu[cont][nPlayTot]+1  
     i=i+1  
     
   return matrEcu

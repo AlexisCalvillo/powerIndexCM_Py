@@ -65,14 +65,14 @@ def powerIndexCM(vecVot, q):
   global eqCoal
   matrEcu=calcMatrEcu(vecVot, q)
   [xs,eqCoal]=calcFObj(matrEcu)
-  #print(eqCoal)
+  print(eqCoal)
   bnd=()
   x0=[1/len(vecVot)]*len(vecVot)
   for i in range(len(matrEcu[0])-1):
     bnd=bnd+((0,1),)
   i=0
   nConst=len(matrEcu)-1
-  #print(eqCoal)
+  print(eqCoal)
   for j in range(nConst):
     exec("""def constr"""+str(j+1)+"""(x0):
       equat=0  
@@ -84,5 +84,6 @@ def powerIndexCM(vecVot, q):
 const.append({'type':'ineq','fun': constr"""+str(j+1)+"""})""",{'eqCoal':eqCoal, 'const':const, 'xs':xs})
   con1={'type':'eq','fun':constraint1}
   const.append(con1)
+  print(const)
   solution=optimize.minimize(objetive,x0,method='SLSQP',bounds=bnd,constraints=const,options={'maxiter':3e7,'ftol':1e-08})
   return [matrEcu, solution, eqCoal]

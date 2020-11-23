@@ -10,7 +10,6 @@ def calcCombVal(vecVot,nPlayTot, votMin):
     
     nPlayTot: Number of players
     VecVot: Vector of player weights
-    q: percent of the total weight (quota, o to 1)
   """
   MComb=[]
   for i in range(2**nPlayTot):

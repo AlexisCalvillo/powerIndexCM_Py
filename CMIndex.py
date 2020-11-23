@@ -85,5 +85,4 @@ const.append({'type':'ineq','fun': constr"""+str(j+1)+"""})""",{'eqCoal':eqCoal,
   con1={'type':'eq','fun':constraint1}
   const.append(con1)
   solution=optimize.minimize(objetive,x0,method='SLSQP',bounds=bnd,constraints=const,options={'maxiter':3e7,'ftol':1e-08})
-  print(solution)
   return [matrEcu, solution, eqCoal]

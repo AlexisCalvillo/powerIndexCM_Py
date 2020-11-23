@@ -16,7 +16,7 @@ def example():
     print("Cota")
     print(votMin)
     print("CM value")
-    print(solutionCM.x)
+    print(solutionCM)
     print("Shapley")
     print(solutionSH)
     print("Banzhaf")

@@ -7,9 +7,8 @@ from IndexesUtils import *
 from sympy import symbols
 import numpy as np
 from  sympy import symbols
-
-eqCoal=[]
 xs=[]
+eqCoal=[]
 fObj=[]
 const=[]
 
@@ -63,6 +62,8 @@ def powerIndexCM(vecVot, q):
   """
   global xs
   global eqCoal
+  eqCoal=[]
+  xs=[]
   matrEcu=calcMatrEcu(vecVot, q)
   [xs,eqCoal]=calcFObj(matrEcu)
   print(eqCoal)

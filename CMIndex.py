@@ -64,6 +64,7 @@ def powerIndexCM(vecVot, q):
   global eqCoal
   eqCoal=[]
   xs=[]
+  const=[]
   matrEcu=calcMatrEcu(vecVot, q)
   [xs,eqCoal]=calcFObj(matrEcu)
   print(eqCoal)

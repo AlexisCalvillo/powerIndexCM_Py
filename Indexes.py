@@ -4,11 +4,12 @@
 import numpy as np
 import itertools as it
 import math as mt
+from IndexesUtils import *
 
 #Índice de poder de shapley
-def shapley(vecVot):
+def shapley(vecVot,q):
   nJugTot=len(vecVot)
-  votMin=np.sum(vecVot)/2
+  votMin=np.sum(vecVot)*q
   #Calcula todas las permutaciones
   permVot=it.permutations([i for i in range(nJugTot)], nJugTot)
   vecAp=[0]*nJugTot
@@ -26,9 +27,9 @@ def shapley(vecVot):
   return vecPag
     
 #Índice de poder banzhaf
-def banzhaf(vecVot):
+def banzhaf(vecVot,q):
   nJugTot=len(vecVot)
-  votMin=np.sum(vecVot)/2
+  votMin=np.sum(vecVot)*q
   #Genera matriz con todas las combinaciones
   MComb=[]
   for i in range(2**nJugTot):
@@ -47,12 +48,12 @@ def banzhaf(vecVot):
   return vecPag
 
 #Índice de poder Deegan-Packel
-def deegPack(vecVot):
+def deegPack(vecVot,q):
   nJugTot=len(vecVot)
   vecPag=[0]*nJugTot
-  votMin=np.sum(vecVot)/2
+  votMin=np.sum(vecVot)*q
   #Cálcula el conjunto de coaliciones mínimas
-  matrEcu=calcMatrEcu(vecVot)
+  matrEcu=calcMatrEcu(vecVot,q)
   #Cardinalidad del conjunto
   cardWm=len(matrEcu)
   for i in range(nJugTot):
@@ -63,12 +64,12 @@ def deegPack(vecVot):
   return vecPag
 
 #índice de poder Holler-Packel
-def hollPack(vecVot):
+def hollPack(vecVot,q):
   nJugTot=len(vecVot)
   vecPag=[0]*nJugTot
-  votMin=np.sum(vecVot)/2
+  votMin=np.sum(vecVot)*q
   #Cálcula el conjunto de coaliciones mínimas
-  matrEcu=calcMatrEcu(vecVot)
+  matrEcu=calcMatrEcu(vecVot,q)
   #Cardinalidad del conjunto
   cardWm=len(matrEcu)
   for i in range(nJugTot):

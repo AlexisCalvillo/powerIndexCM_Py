@@ -2,11 +2,14 @@ from CMIndex import *
 import sympy
 from Indexes import *
 from time import time
+import numpy as np
+import math as mt
+import multiprocessing as mp
 def example():
     q=.50
     vecVot=[20,25,25,30]
     votMin=sum(vecVot)*q
-    [matrEcu,  solutionCM, eqcoal]=powerIndexCM(vecVot,q)
+    [matrEcu,  solutionCM, eqCoal]=powerIndexCM(vecVot,q)
     solutionHP=hollPack(vecVot,q)
     solutionSH=shapley(vecVot,q)
     solutionDP=deegPack(vecVot,q)
@@ -15,7 +18,7 @@ def example():
     print(vecVot)
     print("Cota")
     print(votMin)
-    print("CM value")
+    print("CM value V1")
     print(solutionCM)
     print("Shapley")
     print(solutionSH)
@@ -75,6 +78,19 @@ def calcIndexes(vecVot, q):
     return [timeVec, indexVec]
     
     
+def genAndCalc(playNum,q):
+    """
+    Generates a random vector of weights and calculate all the indexes of power an return the vector generated
+    the time of excecution and the vector of power in this order
+
+    playNum: Numbers of players
+    q: percent of the total weight (quota, o to 1)
+    """
+    vecVot=mt.ceil(np.random.Uniform(0,1,playNum)*100)
+    [timeVec, indexVec]=calcIndexes(vecVot,q)
+    return [vecVot,timeVec,indexVec]
+
+
 
 def test(itNum, playNum, q):
     """
@@ -84,4 +100,14 @@ def test(itNum, playNum, q):
     itNum: Vector of player weight
     q: percent of the total weight (quota, o to 1)
     """
+    pool = mp.Pool(mp.cpu_count())
+    inputsN = range(itNum)
+    for i in range(itNum):
+        [vecVot,timeVec,indexVec] = pool.map_async(genAndCalc, args=(playNum,q))
+    
+    print(vecVot)
+    print(timeVec)
+    print(indexVec)
+       
+
 

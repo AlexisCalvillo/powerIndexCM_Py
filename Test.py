@@ -96,7 +96,7 @@ def collect_result(result):
     global results
     results.append(result)
 
-def test(itNum, playNum, q):
+def test(itNum, playNum, q, prnt):
     """
     Generete a number itNum of examples of WVG and calculate power indexes
 
@@ -117,12 +117,17 @@ def test(itNum, playNum, q):
         vecVot.append(x[0])
         timeVec.append(x[1])
         indexVec.append(x[2])
-    print("Vector de votantes")
-    print(vecVot)
-    print("Vector de tiempos")
-    print(timeVec)
-    print("Vector de índices")
-    print(indexVec)
-       
+    
+    if prnt: 
+        for x in range(itNum):
+            print("Vector de votantes, tiempos y índices" + str(x))
+            print(vecVot[x])
+            print(timeVec[x])
+            print("CM" + str(indexVec[x][0]))
+            print("SH" + str(indexVec[x][1]))
+            print("B" + str(indexVec[x][2]))
+            print("HP" + str(indexVec[x][3]))
+            print("DP" + str(indexVec[x][4]))
+        
 
 

@@ -13,7 +13,7 @@ fObj=[]
 const=[]
 
 def prob(pag,njug):
-  return pag if (njug==1) else  1-((1-pag))**(njug-1)
+  return pag if (njug==1) else  1-(1-pag)**(njug-1)
 
 def probCo(pag,nJug): 
   pJug=prob(pag,nJug)
@@ -49,7 +49,7 @@ def objetive(x0):
 
 
 def constraint1(x0):
-  sum=100
+  sum=1
   for i in x0:
     sum=sum-i
   return sum

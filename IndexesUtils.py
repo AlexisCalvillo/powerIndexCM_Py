@@ -4,17 +4,31 @@
 import numpy as np
 
 def calcCombVal(vecVot,nPlayTot, votMin):
-  #Genera matriz con todas las combinaciones
   """
-    Generate a matrix with all the posibble combinations 
+    Generate a matrix with all the valid combinations 
     
-    nPlayTot: Number of players
-    VecVot: Vector of player weights
-  """
+    Paramters
+    -------
+    nPlayTot: number
+      Number of players 
+    
+    VecVot: list 
+      Vector of player weights
+    
+    votMin: number
+      Quota of the game en terms of wwights
+
+    Return
+    -------
+    MCombVal: list
+      Matrix representatión with all the valid player
+      combinations (>votMin)
+    """
+
   MComb=[]
   for i in range(2**nPlayTot):
     MComb.append([int(n) for n in bin(i)[2:].zfill(nPlayTot)])
-  #Genera matriz con todas las combinaciones validas
+  #Generates the matrix with all the valid combinations
   MCombVal=[]  
   for x in MComb:
     if(np.dot(x,vecVot)>votMin):
@@ -23,10 +37,22 @@ def calcCombVal(vecVot,nPlayTot, votMin):
 
 def calcMatrEcu(vecVot, q):
   """
-    Cauclates the set of minimal winning coalitions and the number of paths to reach that coalition
+  Calculates the set of minimal winning coalitions and the number of 
+  "parent" games
 
-    VecVot: Vector of player weights
-    q: percent of the total weight (quota, o to 1)
+  Parameters
+  -------
+  vecVot: list
+    Vector of weights
+  
+  q: number
+    Percent of the total weight (quota, o to 1)
+
+  Return
+  -------
+  matrEcu: list
+    Matrix representatión of the minimal winning coalition and
+    the number of parent games.
   """
 
   matrEcu=[]

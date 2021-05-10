@@ -49,7 +49,7 @@ def objetive(x0):
 
 
 def constraint1(x0):
-  sum=1
+  sum=100
   for i in x0:
     sum=sum-i
   return sum
@@ -66,23 +66,27 @@ def powerIndexCM(vecVot, q):
   xs=[]
   const=[]
   matrEcu=calcMatrEcu(vecVot, q)
-  [xs,eqCoal]=calcFObj(matrEcu)
-  bnd=()
-  x0=[1/len(vecVot)]*len(vecVot)
-  for i in range(len(matrEcu[0])-1):
-    bnd=bnd+((0,1),)
-  i=0
-  nConst=len(matrEcu)-1
-  for j in range(nConst):
-    exec("""def constr"""+str(j+1)+"""(x0):
-      equat=0  
-      subst=[]
-      equat=eqCoal["""+str(0)+"""]-eqCoal["""+str(j+1)+"""]
-      for k in range(len(x0)):
-        subst.append((xs[k],x0[k]))
-      return -equat.subs(subst)
-const.append({'type':'ineq','fun': constr"""+str(j+1)+"""})""",{'eqCoal':eqCoal, 'const':const, 'xs':xs})
-  con1={'type':'eq','fun':constraint1}
-  const.append(con1)
-  solution=optimize.minimize(objetive,x0,method='SLSQP',bounds=bnd,constraints=const,options={'maxiter':3e7,'ftol':1e-08})
-  return [matrEcu, solution, eqCoal]
+  if(len(matrEcu)==0):
+    return [0, 0, 0]
+  else:
+    [xs,eqCoal]=calcFObj(matrEcu)
+    bnd=()
+    x0=[1/len(vecVot)]*len(vecVot)
+    for i in range(len(matrEcu[0])-1):
+      bnd=bnd+((0,1),)
+    i=0
+    nConst=len(matrEcu)-1
+    for j in range(nConst):
+      exec("""def constr"""+str(j+1)+"""(x0):
+        equat=0  
+        subst=[]
+        equat=eqCoal["""+str(0)+"""]-eqCoal["""+str(j+1)+"""]
+        for k in range(len(x0)):
+          subst.append((xs[k],x0[k]))
+        return -equat.subs(subst)
+        const.append({'type':'ineq','fun': constr"""+str(j+1)+"""})""",{'eqCoal':eqCoal, 'const':const, 'xs':xs})
+    con1={'type':'eq','fun':constraint1}
+    const.append(con1)
+    solution=optimize.minimize(objetive,x0,method='SLSQP',bounds=bnd,constraints=const,options={'maxiter':3e7,'ftol':1e-08})
+    return [matrEcu, solution, eqCoal]
+

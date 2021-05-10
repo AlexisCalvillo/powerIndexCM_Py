@@ -56,6 +56,8 @@ def deegPack(vecVot,q):
   matrEcu=calcMatrEcu(vecVot,q)
   #Cardinalidad del conjunto
   cardWm=len(matrEcu)
+  if (cardWm == 0): 
+    return vecPag
   for i in range(nJugTot):
     for j in range(cardWm):
       if(matrEcu[j][i]==1):
@@ -78,6 +80,8 @@ def hollPack(vecVot,q):
         vecPag[i]=vecPag[i]+1
   
   tot=np.sum(vecPag)
+  if (tot == 0): 
+   return vecPag
   for i in range(nJugTot):
     vecPag[i]=vecPag[i]/tot
   return vecPag

@@ -5,11 +5,23 @@ from time import time
 import numpy as np
 import math as mt
 import multiprocessing as mp
+import csv
+
 
 results =[]
-def example():
-    q=.50
-    vecVot=[20,25,25,30]
+def example(med):
+    """
+    Precharged example. Calculates and print the results of 
+    5-player WVG (Weighted Voting Game) whose weights of 
+    [10, 15, 15, 30, 35] repectly.
+
+    Parameters
+    -------
+    med: number
+        Quota of the defined game
+    """
+    q=med
+    vecVot=[10,10,15,30,35]
     votMin=sum(vecVot)*q
     [matrEcu,  solutionCM, eqCoal]=powerIndexCM(vecVot,q)
     solutionHP=hollPack(vecVot,q)
@@ -36,18 +48,34 @@ def calcIndexes(vecVot, q):
     Calculate the power indexes of a given game and return the excecution
     time
 
-    VecVot: Vector of player weights
-    q: percent of the total weight (quota, o to 1)
+    Parameters
+    -------
+    VecVot: list
+         Vector of player weights
 
+    q: number 
+        Percent of the total weight (quota, o to 1)
+
+    Return
+    -------
+    timeVec: list
+        Vector with the calculation time of each one of the 
+        indexes
+
+    indexVec: list
+        List of list with the value of each index power for all the
+        players
     """
     #CM
     timeVec=[0]*5
     indexVec=[0]*5
     iniT=time()
+    solutionCM=0
     [matrEcu,  solutionCM, eqcoal]=powerIndexCM(vecVot,q)
     finT=time()
     timeVec[0]=finT-iniT
-    indexVec[0]=solutionCM.x.tolist()
+    if(solutionCM!=0):
+        indexVec[0]=solutionCM.x.tolist()
     
     #Holler Packel
     iniT=time()
@@ -82,31 +110,86 @@ def calcIndexes(vecVot, q):
     
 def genAndCalc(i,playNum,q):
     """
-    Generates a random vector of weights and calculate all the indexes of power an return the vector generated
-    the time of excecution and the vector of power in this order
+    Generates a random vector of weights and calculate all the power indexes and 
+    return the vector generated the time of excecution, the vector of power, in this order
 
-    playNum: Numbers of players
-    q: percent of the total weight (quota, o to 1)
+    Parameters
+    -------
+    i: number
+        Thread number to parallel test
+   
+    playNum: number
+        Numbers of players
+
+    q: number
+        Percent of the total weight (quota, o to 1)
+
+    Return
+    -------
+    vecVot: list
+    Vector of weights
+ 
+    timeVec: list
+        Vector with the calculation time of each one of the 
+        indexes
+
+    indexVec: list
+        List of list with the value of each index power for all the
+        players
+
+    probVec: list
+        List of list with the max and min probability of coalition
+
+    puntPag: list
+        List of list with the point which entries are CMIndex and vecVot normalized vector
+
     """
     vecVot=np.ceil(np.random.uniform(0,100,playNum)).tolist()
     [timeVec, indexVec]=calcIndexes(vecVot,q)
-    return [vecVot,timeVec,indexVec]
+
+    probVec =[]
+    for pI in indexVec:
+        probVec.append(evaluaProb(vecVot,pI,q))
+    
+    puntPag = []
+    normVecVot =[]
+    tot=np.sum(vecVot)
+    for x in vecVot:
+        normVecVot.append(x/tot)
+    puntPag=[indexVec[0],normVecVot]
+    return [vecVot,timeVec,indexVec, probVec, puntPag]
 
 def collect_result(result):
+    """
+    Collect the results of the paralell test
+    """
     global results
     results.append(result)
 
-def test(itNum, playNum, q, prnt):
+def test(itNum, playNum, q, prnt=False):
     """
     Generete a number itNum of examples of WVG and calculate power indexes
 
-    playNum: Number of players to generate the players vector weights
-    itNum: Vector of player weight
-    q: percent of the total weight (quota, o to 1)
+    Parameters
+    -------
+
+    itNum: number
+        Number of games to generate en calculates the indexes
+    
+    playNum: number
+        Number of players in the generated games
+    
+    q: number
+        percent of the total weight (quota, o to 1)
+
+    prnt: boolean
+        If prnt=True then the results are printed
     """
     vecVot=[]
     timeVec=[]
+    probVec =[]
     indexVec=[]
+    puntPag = []
     results=[]
     pool = mp.Pool(mp.cpu_count())
     results = pool.starmap_async(genAndCalc,[(i, playNum, q) for i in range(itNum)]).get()
@@ -117,17 +200,37 @@ def test(itNum, playNum, q, prnt):
         vecVot.append(x[0])
         timeVec.append(x[1])
         indexVec.append(x[2])
+        probVec.append(x[3])
+        puntPag.append(x[4])
     
-    if prnt: 
-        for x in range(itNum):
-            print("Vector de votantes, tiempos y índices" + str(x))
-            print(vecVot[x])
-            print(timeVec[x])
-            print("CM" + str(indexVec[x][0]))
-            print("SH" + str(indexVec[x][1]))
-            print("B" + str(indexVec[x][2]))
-            print("HP" + str(indexVec[x][3]))
-            print("DP" + str(indexVec[x][4]))
-        
+    if prnt:
+        strRes = str(playNum) + "Jug_"+ str(q) + "_cota.csv" 
+        myFile = open(strRes, 'w',newline='', encoding='utf-8')
+        with myFile:
+            writer = csv.writer(myFile)
+            for x in results: 
+                writer.writerow([x[0],x[1][0],x[2],x[3],x[4]])
+
+
+def evaluaProb(vecVot, vecPag, q):
+    xs=[]
+    eqCoal=[]
+    nJug=len(vecVot)
+    minMaxPag=[]
+    matrEcu=calcMatrEcu(vecVot, q)
+    if(len(matrEcu)==0):
+        return [0, 0]
+    [xs,fObj]=calcFObj(matrEcu)
+    i=0
+    subs=[]
+    for k in range(len(vecPag)):
+        subs.append((xs[k],vecPag[k]))
+    resProb =[]
+    for coal in fObj:
+        resProb.append(coal.subs(subs))
+    minMaxPag.append(np.min(resProb))
+    minMaxPag.append(np.max(resProb))
+
+    return minMaxPag    
 
 
